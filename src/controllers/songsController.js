@@ -37,6 +37,7 @@ const updateSong = async (req, res) => {
     } else {
       responsePromise = dataService.updateDocument(`songs`, req.body);
     }
+    const response = await responsePromise;
     res.status(200).send(response);
     return;
   } catch (error) {

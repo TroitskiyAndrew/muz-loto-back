@@ -8,13 +8,14 @@ const config = require('./config/config');
 const songsController = require('./controllers/songsController');
 const usersController = require('./controllers/usersController');
 const gamesController = require('./controllers/gamesController');
+const ticketsController = require('./controllers/ticketsController');
 
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: config.frontURL,
     }
 });
 
@@ -43,7 +44,7 @@ const verifyToken = (req, res, next) => {
 
 
 app.use(express.json());
-app.use(cors({origin: "*"}));
+app.use(cors(config.frontURL));
 app.get('/gameByCode/:code', gamesController.getGame); 
 app.post('/auth', usersController.auth);  
 io.on('connection', (socket) => {
@@ -64,10 +65,14 @@ app.put('/songs', songsController.updateSong);
 app.post('/songs', songsController.createSong);  
 app.delete('/songs/:id', songsController.deleteSong);  
 app.get('/users/:id', usersController.getUser);  
+app.put('/users/:id', usersController.updateUser);  
 app.post('/new-user', usersController.createUser);  
 app.get('/games', gamesController.getGames);  
 app.put('/games', gamesController.updateGame);  
 app.post('/games', gamesController.createGame);  
+app.get('/tickets', ticketsController.getTickets);  
+app.put('/tickets', ticketsController.updateTickets);  
+app.post('/tickets', ticketsController.createTickets);  
 
 
 

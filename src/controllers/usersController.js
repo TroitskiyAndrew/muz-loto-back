@@ -38,6 +38,17 @@ const createUser = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {    
+    response = await dataService.updateDocument(`songs`, req.body);
+    res.status(200).send(response);
+    return;
+  } catch (error) {
+    res.status(500).send(error);
+    return;
+  }
+};
+
 const auth = async (req, res) => {
   try {
     const { email, hashedPassword: hashPass } = req.body;
@@ -64,6 +75,7 @@ const auth = async (req, res) => {
 
 module.exports = {
   getUser: getUser,
+  updateUser: updateUser,
   createUser: createUser,
   auth: auth,
 };

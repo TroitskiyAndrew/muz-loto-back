@@ -120,8 +120,7 @@ const getDocumentByQuery = async (collectionName, query) => {
 const updateDocument = async (collectionName, doc) => {
     let result;
     try {
-        await connectClient();
-        
+        await connectClient();        
         const { id, ...rest } = doc;
         const collection = client.db('muzloto').collection(collectionName);
         await collection.updateOne({ _id: new ObjectId(id) }, { $set: rest });
