@@ -43,7 +43,7 @@ const verifyToken = (req, res, next) => {
 
 
 app.use(express.json());
-app.use(cors("*"));
+app.use(cors({origin: "*"}));
 app.get('/gameByCode/:code', gamesController.getGame); 
 app.post('/auth', usersController.auth);  
 io.on('connection', (socket) => {
