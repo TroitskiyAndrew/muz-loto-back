@@ -6,5 +6,5 @@ module.exports = {
     mongodbConnectionString: process.env.MONGODB_CONNECTION_STRING ?? '',
     jwtSecret: process.env.JWT_SECRET ?? '',
     adminId: process.env.ADMIN_ID ?? '',
-    frontURL: process.env.FRONT_URL ?? '*',
+    frontURL: process.env.FRONT_URL ?? 'http://localhost:4200',
 }
