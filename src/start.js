@@ -12,7 +12,11 @@ const gamesController = require('./controllers/gamesController');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: config.frontURL,
+    }
+});
 
 const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user']
 const verifyToken = (req, res, next) => {
