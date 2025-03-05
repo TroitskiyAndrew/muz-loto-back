@@ -40,7 +40,7 @@ const verifyToken = (req, res, next) => {
 
 app.use(express.json());
 app.use(cors({
-    origin: '*'
+    origin: config.frontURL,
 }));
 app.get('/gameByCode/:code', gamesController.getGame); 
 app.post('/auth', usersController.auth);  
