@@ -16,27 +16,27 @@ const server = http.createServer(app);
 const io = new Server(server, {cors: { origin: "*", credentials: true}});
 
 const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user']
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if(req.originalUrl.startsWith('/socket.io')){
-        return;
-    }
-    if(NOT_PROTECTED_ROUTES.some(route => req.originalUrl.startsWith(route))){
-        return next();
-    }
+// const verifyToken = (req, res, next) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if(req.originalUrl.startsWith('/socket.io')){
+//         return;
+//     }
+//     if(NOT_PROTECTED_ROUTES.some(route => req.originalUrl.startsWith(route))){
+//         return next();
+//     }
 
-    if (!token) {
-        return res.status(401).json({ error: "Токен отсутствует" });
-    }
+//     if (!token) {
+//         return res.status(401).json({ error: "Токен отсутствует" });
+//     }
 
-    try {
-        const decoded = jwt.verify(token, config.jwtSecret);
-        req.user = decoded; // Сохраняем данные пользователя в `req`
-        next();
-    } catch (err) {
-        return res.status(403).json({ error: "Неверный или просроченный токен" });
-    }
-};
+//     try {
+//         const decoded = jwt.verify(token, config.jwtSecret);
+//         req.user = decoded; // Сохраняем данные пользователя в `req`
+//         next();
+//     } catch (err) {
+//         return res.status(403).json({ error: "Неверный или просроченный токен" });
+//     }
+// };
 
 
 app.use(express.json());
@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
     });
 });
 
-app.use(verifyToken);
+// app.use(verifyToken);
 
 app.get('/songs', songsController.getSongs);  
 app.put('/songs', songsController.updateSong);  
