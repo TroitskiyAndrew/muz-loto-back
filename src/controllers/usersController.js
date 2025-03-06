@@ -40,7 +40,7 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {    
-    response = await dataService.updateDocument(`songs`, req.body);
+    response = await dataService.updateDocument(`users`, req.body);
     res.status(200).send(response);
     return;
   } catch (error) {

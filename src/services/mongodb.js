@@ -14,7 +14,6 @@ let connectionOpened;
 let timeoutId;
 
 async function connectClient() {
-    console.log('getClient start', connectionOpened);
     clearTimeout(timeoutId);
     if(!connectionOpened){
         connectionOpened = true;
@@ -70,13 +69,12 @@ const createDocuments = async (collectionName, docs) => {
     return result;
 }
 
-const getDocuments = async (collectionName, params) => {
+const getDocuments = async (collectionName, query) => {
     let result;
     try {
         await connectClient();
         
         const collection = client.db('muzloto').collection(collectionName);
-        const query = params  || {};
         const res = await collection.find(query).toArray();
         result = res.map(mapDocumentFromMongo);
     } catch (err) {
@@ -108,7 +106,6 @@ const getDocumentByQuery = async (collectionName, query) => {
         
         const collection = client.db('muzloto').collection(collectionName);
         const doc = await collection.findOne(query);
-        console.log('getDocumentByQuery', doc)
         result = doc ? mapDocumentFromMongo(doc) : null;
     } catch (err) {
         console.log('Operation getDocumentByQuery failed', err);

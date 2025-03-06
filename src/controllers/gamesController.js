@@ -4,21 +4,19 @@ const config = require('../config/config');
 
 const getGame = async (req, res) => {
     try {
-        const query =  {code: req.params.id};
-        if(req.user.id !== config.adminId){
-            query._id = new ObjectId(req.user.id)
-        }
+        const query =  {code: req.params.code};
         const response = await dataService.getDocumentByQuery('games', query);
         res.status(200).send(response);
         return
     } catch (error) {
+        console.log(error)
         res.status(500).send(error);
         return
     }
 }
 const getGames = async (req, res) => {
     try {
-        const query = req.user.id === config.adminId ? {} : {_id: new ObjectId(req.user.id)};
+        const query = req.user.id === config.adminId ? undefined : {_id: new ObjectId(req.user.id)};
         const response = await dataService.getDocuments('games', query);
         res.status(200).send(response);
         return
