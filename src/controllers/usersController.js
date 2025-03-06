@@ -24,6 +24,7 @@ const createUser = async (req, res) => {
     const currentUser = await dataService.getDocumentByQuery("users", { email: req.body.email });
     if(currentUser){
         res.status(403).send('ТАкой юзер уже есть');
+        return
     }
     const user = await dataService.createDocument(`users`, req.body);
     
