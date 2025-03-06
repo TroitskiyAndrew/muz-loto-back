@@ -1,6 +1,7 @@
 const dataService = require("../services/mongodb");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
+const { ObjectId } = require("mongodb");
 
 const getUser = async (req, res) => {
   try {
@@ -38,10 +39,12 @@ const createUser = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
+const increaseUserGames = async (req, res) => {
   try {    
-    response = await dataService.updateDocument(`users`, req.body);
-    res.status(200).send(response);
+    const userId = req.params.userId;
+    const query = {_id: new ObjectId(userId)};
+    response = await dataService.updateDocumentByQuery(`users`, query, { $inc: { gamesCredit: -1 } });
+    res.status(200).send(response?.gamesCredit);
     return;
   } catch (error) {
     res.status(500).send(error);
@@ -75,7 +78,7 @@ const auth = async (req, res) => {
 
 module.exports = {
   getUser: getUser,
-  updateUser: updateUser,
+  increaseUserGames: increaseUserGames,
   createUser: createUser,
   auth: auth,
 };

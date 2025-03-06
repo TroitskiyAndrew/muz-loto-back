@@ -16,8 +16,8 @@ const getGame = async (req, res) => {
 }
 const getGames = async (req, res) => {
     try {
-        // const query = req.user.id === config.adminId ? undefined : {_id: new ObjectId(req.user.id)};
-        const response = await dataService.getDocuments('games', undefined);
+        const query = req.params.userId === config.adminId ? undefined : {_id: new ObjectId(req.params.userId)};
+        const response = await dataService.getDocuments('games', query);
         res.status(200).send(response);
         return
     } catch (error) {

@@ -1,18 +1,33 @@
 const { ObjectId } = require("mongodb/lib/bson");
 const dataService = require("../services/mongodb");
 
+const cashedTickets = {};
+
+function getTicketsFromCash(gameId){
+  const cashedTicketsForGame = cashedTickets[gameId];
+  const tickets = cashedTicketsForGame.splice(0, 3);
+  const isMore = cashedTicketsForGame.length > 0;
+  if(!isMore){
+    delete cashedTickets[gameId];
+  }
+  return {isMore, tickets}
+
+}
+
 const getTickets = async (req, res) => {
   try {
-    const [gameId, roundIndex] = req.params.gameId.split('-');
+    const gameId = req.params.gameId;
+    if(cashedTickets[gameId]){
+      res.status(200).send(getTicketsFromCash(gameId))
+      return;
+    }
+    
     const response = await dataService.getDocumentByQuery("tickets", {gameId});
     if(!response){
       res.status(404).send('К этой игре нет билетов');
     }
-    const result = (response?.tickets || []).map(ticket => ({
-      ...ticket,
-      rounds: [ticket.rounds[roundIndex]]
-    }))
-    res.status(200).send(result);
+    cashedTickets[gameId] = response.tickets || [];
+    res.status(200).send(getTicketsFromCash(gameId));
     return;
   } catch (error) {
     res.status(500).send(error);
@@ -22,7 +37,8 @@ const getTickets = async (req, res) => {
 
 const createTickets = async (req, res) => {
   try {
-    const response = await dataService.createDocument(`tickets`, req.body);
+    const gameId = req.params.gameId;
+    const response = await dataService.createDocument(`tickets`, {gameId, tickets: req.body});
     res.status(200).send(response?.tickets || []);
     return;
   } catch (error) {
@@ -31,11 +47,12 @@ const createTickets = async (req, res) => {
   }
 };
 
-const updateTickets = async (req, res) => {
+const addTickets = async (req, res) => {
   try {
-    const query = {gameId: req.params.gameId}
-    const response = dataService.updateDocuments(`tickets`,query,  req.body);
-    res.status(200).send(response?.tickets || []);
+    const query = {gameId: req.params.gameId};
+    const update =  { $push: { tickets: { $each: req.body } } }
+    await dataService.updateDocumentByQuery(`tickets`, query, update);    
+    res.status(200).send(req.body);
     return;
   } catch (error) {
     res.status(500).send(error);
@@ -46,5 +63,5 @@ const updateTickets = async (req, res) => {
 module.exports = {
   getTickets: getTickets,
   createTickets: createTickets,
-  updateTickets: updateTickets,
+  addTickets: addTickets,
 };

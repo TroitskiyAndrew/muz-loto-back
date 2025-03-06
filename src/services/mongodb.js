@@ -130,6 +130,21 @@ const updateDocument = async (collectionName, doc) => {
     return result;
 }
 
+const updateDocumentByQuery = async (collectionName, query, update) => {
+    let result;
+    try {
+        await connectClient();
+        const collection = client.db('muzloto').collection(collectionName);
+        await collection.updateOne(query, update);
+        const updatedDocument = await collection.findOne(query);
+        result = updatedDocument ? mapDocumentFromMongo(updatedDocument) : null;
+    } catch (err) {
+        console.log('Operation updateDocument failed', err);
+        result = false;
+    } 
+    return result;
+}
+
 const updateDocuments = async (collectionName, query, update) => {
     let result;
     try {
@@ -170,6 +185,7 @@ module.exports = {
     updateDocuments: updateDocuments,
     deleteDocument: deleteDocument,
     createDocuments: createDocuments,
+    updateDocumentByQuery: updateDocumentByQuery,
 };
 
 process.on('exit', () => {

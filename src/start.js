@@ -61,14 +61,14 @@ app.put('/songs', songsController.updateSong);
 app.post('/songs', songsController.createSong);  
 app.delete('/songs/:id', songsController.deleteSong);  
 app.get('/users/:id', usersController.getUser);  
-app.put('/users/:id', usersController.updateUser);  
+app.put('/users/:id', usersController.increaseUserGames);  
 app.post('/new-user', usersController.createUser);  
-app.get('/games', gamesController.getGames);  
+app.get('/games/:userId', gamesController.getGames);  
 app.put('/games', gamesController.updateGame);  
 app.post('/games', gamesController.createGame);  
 app.get('/tickets/:gameId', ticketsController.getTickets);  
-app.put('/tickets/:gameId', ticketsController.updateTickets);  
-app.post('/tickets', ticketsController.createTickets);  
+app.put('/tickets/:gameId', ticketsController.addTickets);  
+app.post('/tickets/:gameId', ticketsController.createTickets);  
 
 
 
