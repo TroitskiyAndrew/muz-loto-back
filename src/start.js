@@ -73,6 +73,6 @@ app.post('/tickets', ticketsController.createTickets);
 
 
 
-app.listen(config.port, () => {
+server.listen(config.port, () => {
     console.log(`Server running on port ${config.port}`);
 });
