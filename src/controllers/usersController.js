@@ -40,7 +40,7 @@ const createUser = async (req, res) => {
   }
 };
 
-const increaseUserGames = async (req, res) => {
+const decreaseUserGames = async (req, res) => {
   try {    
     const userId = req.params.userId;
     const query = {_id: new ObjectId(userId)};
@@ -79,7 +79,7 @@ const auth = async (req, res) => {
 
 module.exports = {
   getUser: getUser,
-  increaseUserGames: increaseUserGames,
+  decreaseUserGames: decreaseUserGames,
   createUser: createUser,
   auth: auth,
 };
