@@ -48,7 +48,7 @@ const updateSong = async (req, res) => {
 
 const deleteSong = async (req, res) => {
   try {
-    const response = await dataService.deleteDocument(`songs`, req.params.id);
+    const response = await dataService.deleteDocument(`songs`, req.params.songId);
     res.status(200).send(response);
     return;
   } catch (error) {

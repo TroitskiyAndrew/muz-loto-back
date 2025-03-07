@@ -59,9 +59,9 @@ io.on('connection', (socket) => {
 app.get('/songs', songsController.getSongs);  
 app.put('/songs', songsController.updateSong);  
 app.post('/songs', songsController.createSong);  
-app.delete('/songs/:id', songsController.deleteSong);  
-app.get('/users/:id', usersController.getUser);  
-app.put('/users/:id', usersController.decreaseUserGames);  
+app.delete('/songs/:songId', songsController.deleteSong);  
+app.get('/users/:userId', usersController.getUser);  
+app.put('/users/:userId', usersController.decreaseUserGames);  
 app.post('/new-user', usersController.createUser);  
 app.get('/games/:userId', gamesController.getGames);  
 app.put('/games', gamesController.updateGame);  

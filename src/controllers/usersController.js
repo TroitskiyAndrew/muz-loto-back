@@ -5,7 +5,7 @@ const { ObjectId } = require("mongodb");
 
 const getUser = async (req, res) => {
   try {
-    const user = await dataService.getDocument("users", req.params.id);
+    const user = await dataService.getDocument("users", req.params.userId);
     if (user) {
       const { hashedPassword, ...rest } = user;
       res.status(200).send(rest);
@@ -44,6 +44,7 @@ const decreaseUserGames = async (req, res) => {
   try {    
     const userId = req.params.userId;
     const query = {_id: new ObjectId(userId)};
+    console.log(userId)
     response = await dataService.updateDocumentByQuery(`users`, query, { $inc: { gamesCredit: -1 } });
     res.status(200).send(response?.gamesCredit);
     return;
