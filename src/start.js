@@ -13,7 +13,7 @@ const ticketsController = require('./controllers/ticketsController');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {cors: { origin: "*", credentials: true}});
+const io = new Server(server, {cors: { origin: config.frontURL, credentials: true}});
 
 const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user']
 // const verifyToken = (req, res, next) => {
@@ -40,7 +40,7 @@ const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user']
 
 
 app.use(express.json());
-app.use(cors({ origin: '*', credentials: true}));
+app.use(cors({ origin: config.frontURL, credentials: true}));
 app.get('/gameByCode/:code', gamesController.getGame); 
 app.post('/auth', usersController.auth);  
 io.on('connection', (socket) => {
