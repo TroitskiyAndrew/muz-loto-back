@@ -15,7 +15,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {cors: { origin: config.frontURL, credentials: true}});
 
-const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user', '/updateResults', '/tickets']
+const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user', '/tickets', '/games']
 const verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     if(req.originalUrl.startsWith('/socket.io')){
@@ -54,8 +54,7 @@ io.on('connection', (socket) => {
     });
 });
 
-app.use(verifyToken);
-app.put('/updateResults', gamesController.updateGame);  
+app.use(verifyToken); 
 
 app.get('/songs', songsController.getSongs);  
 app.put('/songs', songsController.updateSong);  

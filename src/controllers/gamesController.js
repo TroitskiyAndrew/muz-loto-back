@@ -51,25 +51,11 @@ const updateGame = async (req, res) => {
     }
 }
 
-const updateResults = async (req, res) => {
-    try {
-        if(req.body.results.rounds[0].playedSongs.length === 0){
-            res.status(401).send('bad results');
-            return;
-        }
-        const response = await dataService.updateDocument(`games`, req.body); 
-        res.status(200).send(response);
-        return
-    } catch (error) {
-        res.status(500).send(error);
-        return
-    }
-}
+
 
 module.exports = {
     getGame: getGame,
     getGames: getGames,
     createGame: createGame,
     updateGame: updateGame,
-    updateResults: updateResults,
 }
