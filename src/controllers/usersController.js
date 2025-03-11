@@ -56,7 +56,7 @@ const auth = async (req, res) => {
       expiresIn: "24h",
     });
     const { hashedPassword, ...rest } = user;
-    res.status(200).send({ user: rest, token });
+    res.status(200).send({ user: {...rest, isAdmin: user.id === config.adminId}, token });
     return;
   } catch (error) {
     res.status(500).send(error);
