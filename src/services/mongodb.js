@@ -161,6 +161,30 @@ const updateDocuments = async (collectionName, query, update) => {
     return result;
 }
 
+const updateDocumentsByQuery = async (collectionName, updates) => {
+    let result;
+    try {
+        await connectClient();
+        
+        const collection = client.db('muzloto').collection(collectionName);
+        
+        const bulkOps = updates.map(({ id, updateQuery }) => ({
+            updateOne: {
+                filter: { _id: new ObjectId(id) },
+                update: updateQuery,
+            },
+        }));
+
+        await collection.bulkWrite(bulkOps);
+        const updatedDocuments = await collection.find({_id: {$in: updates.map(id => new ObjectId(id))}}).toArray();
+        result = updatedDocuments.map(mapDocumentFromMongo);
+    } catch (err) {
+        console.log('Operation updateDocuments failed', err);
+        result = false;
+    } 
+    return result;
+}
+
 const deleteDocument = async (collectionName, id) => {
     let result;
     try {
@@ -168,6 +192,19 @@ const deleteDocument = async (collectionName, id) => {
         
         const collection = client.db('muzloto').collection(collectionName);
         await collection.deleteOne({ _id: new ObjectId(id) });
+        result = true;
+    } catch (err) {
+        console.log('Operation updateDocuments failed', err);
+        result = null;
+    } 
+    return result;
+}
+const deleteDocumentByQuery = async (collectionName, query) => {
+    let result;
+    try {
+        await connectClient();
+        const collection = client.db('muzloto').collection(collectionName);
+        await collection.deleteOne(query);
         result = true;
     } catch (err) {
         console.log('Operation updateDocuments failed', err);
@@ -184,8 +221,10 @@ module.exports = {
     updateDocument: updateDocument,
     updateDocuments: updateDocuments,
     deleteDocument: deleteDocument,
+    deleteDocumentByQuery: deleteDocumentByQuery,
     createDocuments: createDocuments,
     updateDocumentByQuery: updateDocumentByQuery,
+    updateDocumentsByQuery: updateDocumentsByQuery,
 };
 
 process.on('exit', () => {

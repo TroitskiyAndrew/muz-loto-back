@@ -8,7 +8,7 @@ const getUser = async (req, res) => {
     const user = await dataService.getDocument("users", req.user.id);
     if (user) {
       const { hashedPassword, ...rest } = user;
-      res.status(200).send(rest);
+      res.status(200).send({...rest, isAdmin: user.id === config.adminId});
       return;
     }
     res.status(404).send(null);

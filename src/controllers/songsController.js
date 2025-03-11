@@ -4,7 +4,23 @@ const dataService = require("../services/mongodb");
 const getSongs = async (req, res) => {
   try {
     const response = await dataService.getDocuments("songs");
-    res.status(200).send(response);
+    const userGames = await dataService.getDocuments("games", {
+      owner: req.user.id,
+    });
+    const songsWithPreferencesAndUsage = response.map((dataBaseSong) => {
+      const { preferences, games, ...song } = dataBaseSong;
+      const history = (games || [])
+        .filter((game) =>
+          userGames.map((userGame) => userGame.code).includes(game.code)
+        )
+        .map((game) => ({
+          ...game,
+          lastStart: userGames.find((userGame) => userGame.code === game.code)?.lastStart || '',
+        }));
+      return { ...song, ...preferences[req.user.id], history };
+    });
+
+    res.status(200).send(songsWithPreferencesAndUsage);
     return;
   } catch (error) {
     res.status(500).send(error);
@@ -27,21 +43,11 @@ const createSong = async (req, res) => {
 
 const updateSong = async (req, res) => {
   try {
-    let responsePromise;
-    if (req.body.gameCode) {
-      const query = {
-        _id: { $in: req.body.songIds.map((songId) => new ObjectId(songId)) },
-      };
-      const update = { $push: { games: req.body.gameCode } };
-      responsePromise = dataService.updateDocuments(`songs`, query, update);
-    } else {
-      if(!req.user.isAdmin){
-        res.status(401).send("Нельзя");
-        return;
-      }
-      responsePromise = dataService.updateDocument(`songs`, req.body);
+    if (!req.user.isAdmin) {
+      res.status(401).send("Нельзя");
+      return;
     }
-    const response = await responsePromise;
+    const response = await dataService.updateDocument(`songs`, req.body);
     res.status(200).send(response);
     return;
   } catch (error) {
@@ -52,11 +58,14 @@ const updateSong = async (req, res) => {
 
 const deleteSong = async (req, res) => {
   try {
-    if(!req.user.isAdmin){
+    if (!req.user.isAdmin) {
       res.status(401).send("Нельзя");
       return;
     }
-    const response = await dataService.deleteDocument(`songs`, req.params.songId);
+    const response = await dataService.deleteDocument(
+      `songs`,
+      req.params.songId
+    );
     res.status(200).send(response);
     return;
   } catch (error) {

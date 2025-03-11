@@ -60,13 +60,13 @@ app.use(verifyToken);
 
 app.get('/users', usersController.getUser);  
 
-app.get('/songs', songsController.getSongs);  
-app.put('/songs', songsController.updateSong);  
+app.get('/songs', songsController.getSongs);    
 app.post('/songs', songsController.createSong);  
 app.delete('/songs/:songId', songsController.deleteSong); 
 
 app.get('/games', gamesController.getGames);  
 app.post('/games', gamesController.createGame);  
+app.delete('/games/:gameId', gamesController.deleteGame);  
 app.put('/tickets/:gameId', ticketsController.addTickets);  
 app.post('/tickets/:gameId', ticketsController.createTickets);  
 
