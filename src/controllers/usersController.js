@@ -26,7 +26,7 @@ const createUser = async (req, res) => {
         res.status(403).send('ТАкой юзер уже есть');
         return
     }
-    const user = await dataService.createDocument(`users`, req.body);
+    const user = await dataService.createDocument(`users`, {...req.body, gamesCredit: 0});
     
     const token = jwt.sign({ id: user.id }, config.jwtSecret, {
       expiresIn: "24h",
