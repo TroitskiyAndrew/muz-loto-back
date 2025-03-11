@@ -7,7 +7,9 @@ const getSongs = async (req, res) => {
     const userGames = await dataService.getDocuments("games", {
       owner: req.user.id,
     });
-    const songsWithPreferencesAndUsage = response.map((dataBaseSong) => {
+    const songsWithPreferencesAndUsage = response.filter(dataBaseSong => {
+      return (req.user.isAdmin || ! dataBaseSong.owner) ? true : dataBaseSong.owner === req.user.id;
+    }).map((dataBaseSong) => {
       const { preferences, games, ...song } = dataBaseSong;
       const history = (games || [])
         .filter((game) =>
@@ -15,7 +17,7 @@ const getSongs = async (req, res) => {
         )
         .map((game) => ({
           ...game,
-          lastStart: userGames.find((userGame) => userGame.code === game.code)?.lastStart || '',
+          lastStart: userGames.find((userGame) => userGame.code === game.code)?.results.lastStart || '',
         }));
       return { ...song, ...preferences[req.user.id], history };
     });
@@ -23,6 +25,7 @@ const getSongs = async (req, res) => {
     res.status(200).send(songsWithPreferencesAndUsage);
     return;
   } catch (error) {
+    console.log(error)
     res.status(500).send(error);
     return;
   }
@@ -30,9 +33,13 @@ const getSongs = async (req, res) => {
 
 const createSong = async (req, res) => {
   try {
-    const response = Array.isArray(req.body)
-      ? await dataService.createDocuments(`songs`, req.body)
-      : await dataService.createDocument(`songs`, req.body);
+    const song = req.body;
+    if(!req.user.isAdmin){
+      song.owner = req.user.id;
+    }
+    song.preferences = {};
+    const response = await dataService.createDocument(`songs`, req.body);
+
     res.status(200).send(response);
     return;
   } catch (error) {

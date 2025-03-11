@@ -62,6 +62,7 @@ app.get('/users', usersController.getUser);
 
 app.get('/songs', songsController.getSongs);    
 app.post('/songs', songsController.createSong);  
+app.put('/songs', songsController.updateSong);  
 app.delete('/songs/:songId', songsController.deleteSong); 
 
 app.get('/games', gamesController.getGames);  
