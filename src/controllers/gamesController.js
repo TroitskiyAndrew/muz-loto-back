@@ -81,23 +81,16 @@ const createGame = async (req, res) => {
 
 const updateGame = async (req, res) => {
   try {
-    if (req.body.ticketsCount) {
-      const response = await dataService.updateDocument(`games`, {
-        id: req.body.id,
-        ticketsCount: req.body.ticketsCount,
-      });
-      res.status(200).send(response);
-      return;
-    } else if (req.body.results) {
+    if (req.body.results) {
       const game = await dataService.getDocument("games", req.body.id);
       const reset = req.body.results.rounds.some(
-        (round, index) => round.step < game.results.rounds[index]?.step
+        (round, index) => round.playedSongs.length < game.results.rounds[index]?.playedSongs.length
       );
       const cantReset =
         !game.results.lastStart ||
         game.results.currentRoundIndex > 0 ||
         game.results.currentStep > 5;
-      if (reset && cantReset) {
+      if (!game.testGame && reset && cantReset) {
         res.status(403).send("Нельзя");
         return;
       }
