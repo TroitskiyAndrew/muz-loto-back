@@ -5,7 +5,7 @@ const { ObjectId } = require("mongodb");
 
 const getUser = async (req, res) => {
   try {
-    const user = await dataService.getDocument("users", req.params.userId);
+    const user = await dataService.getDocument("users", req.user.id);
     if (user) {
       const { hashedPassword, ...rest } = user;
       res.status(200).send(rest);
@@ -23,7 +23,7 @@ const createUser = async (req, res) => {
   try {
     const currentUser = await dataService.getDocumentByQuery("users", { email: req.body.email });
     if(currentUser){
-        res.status(403).send('ТАкой юзер уже есть');
+        res.status(403).send('Такой юзер уже есть');
         return
     }
     const user = await dataService.createDocument(`users`, {...req.body, gamesCredit: 0});
@@ -33,20 +33,6 @@ const createUser = async (req, res) => {
     });
     const { hashedPassword, ...rest } = user;
     res.status(200).send({ user: rest, token });
-    return;
-  } catch (error) {
-    res.status(500).send(error);
-    return;
-  }
-};
-
-const decreaseUserGames = async (req, res) => {
-  try {    
-    const userId = req.params.userId;
-    const query = {_id: new ObjectId(userId)};
-    console.log(userId)
-    response = await dataService.updateDocumentByQuery(`users`, query, { $inc: { gamesCredit: -1 } });
-    res.status(200).send(response?.gamesCredit);
     return;
   } catch (error) {
     res.status(500).send(error);
@@ -66,7 +52,7 @@ const auth = async (req, res) => {
         res.status(401).send("Неверный мпароль");
         return;
     }
-    const token = jwt.sign({ id: user.id }, config.jwtSecret, {
+    const token = jwt.sign({ id: user.id, isAdmin: user.id === config.adminId}, config.jwtSecret, {
       expiresIn: "24h",
     });
     const { hashedPassword, ...rest } = user;
@@ -80,7 +66,6 @@ const auth = async (req, res) => {
 
 module.exports = {
   getUser: getUser,
-  decreaseUserGames: decreaseUserGames,
   createUser: createUser,
   auth: auth,
 };

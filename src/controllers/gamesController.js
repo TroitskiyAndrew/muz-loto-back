@@ -17,10 +17,9 @@ const getGame = async (req, res) => {
 const getGames = async (req, res) => {
     try {
         const query =
-            req.params.userId === config.adminId
+            req.user.isAdmin
                 ? undefined
-                : { owner: req.params.userId };
-        console.log(query);
+                : { owner: req.user.id };
         const response = await dataService.getDocuments("games", query);
         res.status(200).send(response);
         return;
@@ -32,9 +31,13 @@ const getGames = async (req, res) => {
 
 const createGame = async (req, res) => {
     try {
-        const response = Array.isArray(req.body)
-            ? await dataService.createDocuments(`games`, req.body)
-            : await dataService.createDocument(`games`, req.body);
+        const user = await dataService.getDocument('users', req.user.id);
+        if(!user.gamesCredit){
+            res.status(203).send("Нельзя");
+            return;
+        }
+        await dataService.updateDocumentByQuery(`users`, {_id: new ObjectId(req.user.id)}, { $inc: { gamesCredit: -1 } });
+        const response = await dataService.createDocument(`games`, req.body);
         res.status(200).send(response);
         return;
     } catch (error) {
@@ -51,11 +54,10 @@ const updateGame = async (req, res) => {
             return;
         } else if (req.body.results) {
             const game = await dataService.getDocument('games', req.body.id);
-            const reset = req.body.results.rounds.length === 0 ||  req.body.results.rounds.some((round, index) => round.step < game.results.rounds[index]?.step);
+            const reset = req.body.results.rounds.some((round, index) => round.step < game.results.rounds[index]?.step);
             const cantReset = !game.results.lastStart ||
-                game.results.rounds.length === 0 ||
-                game.results.rounds[0].step > 5;
-            console.log('cantReset',cantReset)
+                game.results.currentRoundIndex > 0 ||
+                game.results.currentStep > 5;
             if (reset && cantReset) {
                 res.status(403).send("Нельзя")
                 return;

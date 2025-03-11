@@ -15,23 +15,20 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {cors: { origin: config.frontURL, credentials: true}});
 
-const NOT_PROTECTED_ROUTES = ['/gameByCode', '/auth', '/new-user', '/tickets', '/games']
 const verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     if(req.originalUrl.startsWith('/socket.io')){
         return;
     }
-    if(NOT_PROTECTED_ROUTES.some(route => req.originalUrl.startsWith(route))){
-        return next();
-    }
 
     if (!token) {
+        console.log('ahtung')
         return res.status(401).json({ error: "Токен отсутствует" });
     }
 
     try {
         const decoded = jwt.verify(token, config.jwtSecret);
-        req.user = decoded; // Сохраняем данные пользователя в `req`
+        req.user = decoded;
         next();
     } catch (err) {
         return res.status(403).json({ error: "Неверный или просроченный токен" });
@@ -41,11 +38,16 @@ const verifyToken = (req, res, next) => {
 
 app.use(express.json());
 app.use(cors({ origin: config.frontURL, credentials: true}));
+
 app.get('/gameByCode/:code', gamesController.getGame); 
 app.post('/auth', usersController.auth);  
+app.post('/users', usersController.createUser);  
+app.get('/tickets/:gameId', ticketsController.getTickets);  
+app.put('/games', gamesController.updateGame);  
+
 io.on('connection', (socket) => {
     console.log('Клиент подключен:', socket.id);
-
+    
     socket.on('messageToBack', (data) => {
         io.emit('messageToClient', data);
     });
@@ -56,17 +58,15 @@ io.on('connection', (socket) => {
 
 app.use(verifyToken); 
 
+app.get('/users', usersController.getUser);  
+
 app.get('/songs', songsController.getSongs);  
 app.put('/songs', songsController.updateSong);  
 app.post('/songs', songsController.createSong);  
-app.delete('/songs/:songId', songsController.deleteSong);  
-app.get('/users/:userId', usersController.getUser);  
-app.put('/users/:userId', usersController.decreaseUserGames);  
-app.post('/new-user', usersController.createUser);  
-app.get('/games/:userId', gamesController.getGames);  
-app.put('/games', gamesController.updateGame);  
+app.delete('/songs/:songId', songsController.deleteSong); 
+
+app.get('/games', gamesController.getGames);  
 app.post('/games', gamesController.createGame);  
-app.get('/tickets/:gameId', ticketsController.getTickets);  
 app.put('/tickets/:gameId', ticketsController.addTickets);  
 app.post('/tickets/:gameId', ticketsController.createTickets);  
 

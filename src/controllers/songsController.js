@@ -35,6 +35,10 @@ const updateSong = async (req, res) => {
       const update = { $push: { games: req.body.gameCode } };
       responsePromise = dataService.updateDocuments(`songs`, query, update);
     } else {
+      if(!req.user.isAdmin){
+        res.status(401).send("Нельзя");
+        return;
+      }
       responsePromise = dataService.updateDocument(`songs`, req.body);
     }
     const response = await responsePromise;
@@ -48,6 +52,10 @@ const updateSong = async (req, res) => {
 
 const deleteSong = async (req, res) => {
   try {
+    if(!req.user.isAdmin){
+      res.status(401).send("Нельзя");
+      return;
+    }
     const response = await dataService.deleteDocument(`songs`, req.params.songId);
     res.status(200).send(response);
     return;

@@ -38,10 +38,12 @@ const getTickets = async (req, res) => {
 const createTickets = async (req, res) => {
   try {
     const gameId = req.params.gameId;
+    await dataService.updateDocumentByQuery('games', {_id: new ObjectId(gameId)}, { $inc: { ticketsCount: +req.body.length } })
     const response = await dataService.createDocument(`tickets`, {gameId, tickets: req.body});
     res.status(200).send(response?.tickets || []);
     return;
   } catch (error) {
+    console.log(error)
     res.status(500).send(error);
     return;
   }
@@ -49,8 +51,10 @@ const createTickets = async (req, res) => {
 
 const addTickets = async (req, res) => {
   try {
-    const query = {gameId: req.params.gameId};
-    const update =  { $push: { tickets: { $each: req.body } } }
+    const gameId = req.params.gameId;
+    await dataService.updateDocumentByQuery('games', {_id: new ObjectId(gameId)}, { $inc: { ticketsCount: +req.body.length } })
+    const query = {gameId};
+    const update =  { $push: { tickets: { $each: req.body } } };
     await dataService.updateDocumentByQuery(`tickets`, query, update);    
     res.status(200).send(req.body);
     return;
