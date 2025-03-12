@@ -4,9 +4,8 @@ const dataService = require("../services/mongodb");
 const getSongs = async (req, res) => {
   try {
     const response = await dataService.getDocuments("songs");
-    const userGames = await dataService.getDocuments("games", {
-      owner: req.user.id,
-    });
+    const userGamesQuery = req.user.isAdmin ? undefined : {owner: req.user.id}
+    const userGames = await dataService.getDocuments("games", userGamesQuery);
     const songsWithPreferencesAndUsage = response.filter(dataBaseSong => {
       return (req.user.isAdmin || ! dataBaseSong.owner) ? true : dataBaseSong.owner === req.user.id;
     }).map((dataBaseSong) => {
@@ -87,3 +86,5 @@ module.exports = {
   updateSong: updateSong,
   deleteSong: deleteSong,
 };
+
+
