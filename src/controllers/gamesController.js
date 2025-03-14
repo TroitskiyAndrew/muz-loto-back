@@ -90,7 +90,7 @@ const updateGame = async (req, res) => {
         !game.results.lastStart ||
         game.results.currentRoundIndex > 0 ||
         game.results.currentStep > 5;
-      if (!game.testGame && reset && cantReset) {
+      if (!game.testGame && reset && cantReset && !req.user.isAdmin) {
         res.status(403).send("Нельзя");
         return;
       }
@@ -101,6 +101,7 @@ const updateGame = async (req, res) => {
     res.status(403).send("Нельзя");
     return;
   } catch (error) {
+    console.log(error)
     res.status(500).send(error);
     return;
   }
