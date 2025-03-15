@@ -21,12 +21,13 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const currentUser = await dataService.getDocumentByQuery("users", { email: req.body.email });
+    const email  = req.body.email.toLowerCase()
+    const currentUser = await dataService.getDocumentByQuery("users", { email });
     if(currentUser){
         res.status(403).send('Такой юзер уже есть');
         return
     }
-    const user = await dataService.createDocument(`users`, {...req.body, gamesCredit: 0});
+    const user = await dataService.createDocument(`users`, {...req.body, email, gamesCredit: 0});
     
     const token = jwt.sign({ id: user.id }, config.jwtSecret, {
       expiresIn: "24h",
@@ -43,7 +44,7 @@ const createUser = async (req, res) => {
 const auth = async (req, res) => {
   try {
     const { email, hashedPassword: hashPass } = req.body;
-    const user = await dataService.getDocumentByQuery("users", { email });
+    const user = await dataService.getDocumentByQuery("users", { email: email.toLowerCase() });
     if (!user) {
       res.status(400).send("Нет такого юзера");
       return;
